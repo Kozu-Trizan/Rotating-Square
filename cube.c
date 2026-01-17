@@ -22,20 +22,18 @@ void create_canvas();
 
 /*Main Function*/
 int main(){
-    char *buffer;
+    create_canvas();
+    char *buffer = (char*)malloc(con_width * con_height);
     float angle = 0;
     COORD coord = {0, 0};
     DWORD written;
-    int x_offset = -6, y_offset = 0, z_offset = 0;
-
-    create_canvas();
-    buffer = (char *)malloc(con_width * con_height);
+    int x_offset = 0, y_offset = 0, z_offset = 0;
 
     /*Create coordinates in 2D plane for cube*/
     /*X = x - z/2 and Y = y - z/2*/
     while(1){
-        if (x_offset > 6) x_offset = -6;
-        //if (y_offset > 6) y_offset = 0;
+        if (x_offset > 6) x_offset = 0;
+        if (y_offset > 6) y_offset = 0;
         if (z_offset > 6) z_offset = 0;
 
         memset(buffer, ' ', con_width * con_height);
@@ -50,11 +48,26 @@ int main(){
                     vector[x-x_offset][y-y_offset][z-z_offset].Y = y;
                     vector[x-x_offset][y-y_offset][z-z_offset].Z = z;
 
-                    int buff_x = con_width/2 + (x - z/2)*2;
-                    int buff_y = con_height/2 - (y - z/2);
+                    int buff_x = con_width/2 + (x + z/2)*2;
+                    int buff_y = con_height/2 - (y + z/2);
 
                     if (buff_x >= 0 && buff_x < con_width && buff_y >= 0 && buff_y < con_height) {
-                        buffer[buff_y * con_width + buff_x] = '0';
+                        // Draw edges where at least 2 coordinates are at boundaries
+                        int is_edge = 0;
+                        
+                        // Check if at min/max boundaries
+                        int x_boundary = (x == x_offset) || (x == x_offset + DIMENSION - 1);
+                        int y_boundary = (y == y_offset) || (y == y_offset + DIMENSION - 1);
+                        int z_boundary = (z == z_offset) || (z == z_offset + DIMENSION - 1);
+                        
+                        // Count how many boundaries this point is at
+                        int boundary_count = x_boundary + y_boundary + z_boundary;
+                        
+                        if (boundary_count >= 2) {
+                            is_edge = 1;
+                        }
+                        
+                        buffer[buff_x + con_width * buff_y] = is_edge ? '*' : '*';
                     }
                 }
             }
