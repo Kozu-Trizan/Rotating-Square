@@ -8,6 +8,7 @@
 #define DIMENSION 16
 #define PI 3.141592654
 
+
 int con_height, con_width;
 HANDLE hConsole;
 
